@@ -1,8 +1,12 @@
+import os
+
 from rest_framework import serializers
 
-from image_api.models import Image
+from image_api.models import ImageData
+
 
 class ImageSerializer(serializers.ModelSerializer):
+
     class Meta:
-        model = Image
-        fields = ['id', 'image', 'ascii_image']
+        model = ImageData
+        fields = ['id', 'name', 'path', 'desc', 'created_at']

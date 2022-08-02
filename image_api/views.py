@@ -1,27 +1,71 @@
-from django.shortcuts import render
+from uuid import uuid4
 
-from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveAPIView
+from django.core.exceptions import ObjectDoesNotExist
+from django.utils.datastructures import MultiValueDictKeyError
+
+from rest_framework.views import APIView
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from rest_framework.status import HTTP_200_OK
+from rest_framework.status import HTTP_200_OK, HTTP_201_CREATED, HTTP_400_BAD_REQUEST
 
-from image_api.models import Image
+from PIL import Image as PILImage
+
+from image_api.models import ImageData
 from image_api.serializers import ImageSerializer
 
+from image_api.asciify import asciify_image
 
-class ImageView(CreateAPIView, ListAPIView, RetrieveAPIView):
-    serializer = ImageSerializer
-    querytset = Image.objects.all()
 
-    def create(self, request, *args, **kwargs):
-        return Response("Create", HTTP_200_OK)
+class ImageListCreateView(APIView):
+    serializer_class = ImageSerializer
 
-    def list(self, request, *args, **kwargs):
-        return Response("List", HTTP_200_OK)
+    def post(self, request, *args, **kwargs):
+        # Create initial data object to be filled by request and used by serializer
+        data = {
+            'name': '',
+            'path': 'images/',
+            'desc': ''
+        }
+        # If file cannot be opened then an image has not been provided in the request body
+        try:
+            image = PILImage.open(request.FILES['image'])
+        except MultiValueDictKeyError:
+            return Response('Please provide an image in the body of the request in the format of formdata')
+        if request.data['name']:
+            data['name'] = request.data['name'] + '.' + image.format
+        else:
+            data['name'] = str(uuid4().hex[:6].upper()) + "." + image.format
 
-    def retrieve(self, request, *args, **kwargs):
-        return Response("Retrieve", HTTP_200_OK)
+        data['path'] = data['path'] + data['name']
 
-@api_view(["GET"])
-def image_list(request):
-    return Response("List", HTTP_200_OK)
+        serializer = self.serializer_class(data=data)
+        if serializer.is_valid():
+            image_data = serializer.save()
+            image.save(fp=data['path'], format=image.format)
+
+            return Response(image_data.id, HTTP_201_CREATED)
+
+        return Response(serializer.errors, HTTP_400_BAD_REQUEST)
+
+
+    def get(self, request, *args, **kwargs):
+        # Get all image data objects
+        result = ImageData.objects.all()
+        # Serialize the result
+        serialized_result = self.serializer_class(result, many=True)
+        # Return serialized list in response
+        return Response(serialized_result.data, HTTP_200_OK)
+
+
+class ImageDetailView(APIView):
+    serializer_class = ImageSerializer
+
+    def get(self, request, *args, **kwargs):
+        image_id = kwargs['id']
+        try:
+            image_data = ImageData.objects.get(pk=image_id)
+        except ObjectDoesNotExist:
+            return Response('No image with given id', HTTP_200_OK)
+
+        asciified_image = asciify_image(img_path=image_data.path)
+        return Response(asciified_image, HTTP_200_OK, content_type="text/plain")
