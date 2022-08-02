@@ -38,7 +38,7 @@ I opted for the second approach because in my development I had a few troubles i
 
 ## Q: What would you change or enhance for a production rollout of this service?
 1. I think the addition of the concept of users would be a benificial feature. That way a user of this service would be able to more easily see all the images they have uploaded rather than either seeing a list of all images or remembering the ids of the images they've uploaded. This would also entail setting some sort of auth, something like a 3rd party OAuth2 service provider so users can sign in using existing accounts.
-2. I would host this service remotely on a hosting platform (something like ec2) as well as setup a remote file storage for the images (maybe something like S3)
+2. I would host this service remotely on a hosting platform (something like ec2) as well as setup a remote file storage for the images (something like S3)
 3. Continuous deployment pipeline: I think an established process for deploying to different environments (i.e. dev, stage, prod) would greatly benifit development efforts in the future and would create a more maintainable codebase. 
 4. I would want to implement some form of logging for easier debugging if a bug showed up after deployment and we wanted to figure out what caused it.
 

@@ -27,7 +27,10 @@ class ImageListCreateView(APIView):
         try:
             image = PILImage.open(request.FILES['image'])
         except MultiValueDictKeyError:
-            return Response('Please provide an image in the body of the request in the format of formdata')
+            return Response(
+                data='Please provide an image in the body of the request in the format of formdata',
+                status=HTTP_400_BAD_REQUEST
+            )
         
         # Generate a unique actual name for the image being stored so as
         # to avoid collisions with duplicate image names
@@ -71,10 +74,10 @@ class ImageDetailView(APIView):
         try:
             image_data = ImageData.objects.get(pk=image_id)
         except ObjectDoesNotExist:
-            return Response('No image with given id', HTTP_200_OK)
+            return Response('No image with given id', HTTP_400_BAD_REQUEST)
 
         # Asciify the image and return it in the response body as plain text
         asciified_image = asciify_image(img_path=image_data.path)
         # NOTE: Having trouble with the ascii image's '\n' character not being interpreted as
         # a new line so editing the size of the terminal window is required.
-        return Response(asciified_image, HTTP_200_OK, content_type="text/plain")
+        return Response(data=asciified_image, status=HTTP_200_OK, content_type='text/plain')
