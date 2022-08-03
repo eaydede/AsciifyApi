@@ -7,6 +7,7 @@
 I've made some minor changes to the usage of the api than what was given as example on the assignment sheet and I hope that's alright! Some of these changes include:
 1. Sending an image in the body of a request with the format of form-data
 2. Adding a trailing slash to each of the `image/` paths
+3. Opted to use `pip` and `venv` rather than poetry to save time as I am not familiar with `poetry`
 
 I've tried to document each of the endpoints and how they'll be used to the best of my ability, I hope this helps!
 
