@@ -47,10 +47,16 @@ class ImageListCreateView(APIView):
             # Save the image in the given path
             image.save(fp=image_data.path, format=image.format)
 
-            return Response(image_data.id, HTTP_201_CREATED)
+            return Response(
+                data=image_data.id,
+                status=HTTP_201_CREATED
+            )
 
         # Return any errors that occured during serialization
-        return Response(serializer.errors, HTTP_400_BAD_REQUEST)
+        return Response(
+            data=serializer.errors,
+            status=HTTP_400_BAD_REQUEST
+        )
 
     def get(self, request, *args, **kwargs):
         # Get all image data objects
@@ -60,7 +66,10 @@ class ImageListCreateView(APIView):
         serialized_result = self.serializer_class(result, many=True)
 
         # Return serialized list in response
-        return Response(serialized_result.data, HTTP_200_OK)
+        return Response(
+            data=serialized_result.data,
+            status=HTTP_200_OK
+        )
 
 
 class ImageDetailView(APIView):
@@ -73,12 +82,17 @@ class ImageDetailView(APIView):
         try:
             image_data = ImageData.objects.get(pk=image_id)
         except ObjectDoesNotExist:
-            return Response("No image with given id", HTTP_400_BAD_REQUEST)
+            return Response(
+                data="No image with given id",
+                status=HTTP_400_BAD_REQUEST
+            )
 
         # Asciify the image and return it in the response body as plain text
         asciified_image = asciify_image(img_path=image_data.path)
         # NOTE: Having trouble with the ascii image's '\n' character not being interpreted as
         # a new line so editing the size of the terminal window is required.
         return Response(
-            data=asciified_image, status=HTTP_200_OK, content_type="text/plain"
+            data=asciified_image,
+            status=HTTP_200_OK,
+            content_type="text/plain"
         )

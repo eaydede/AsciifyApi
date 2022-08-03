@@ -128,4 +128,4 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 10240
 
-MEDIA_ROOT = os.path.join(BASE_DIR, 'images/')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'images')
