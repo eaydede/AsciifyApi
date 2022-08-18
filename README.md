@@ -1,4 +1,4 @@
-# PlanetImageApi
+# ImageApi
 
 
 **NOTE:** I had a lot of difficulty trying to display the ascii image correctly without characters looking skewed or wrapping to the next line, but in the end I wasn't quite able to figure it out. I believe the ascii image is still generated and can be seen if the window size shows exactly 100 characters. Just wanted to make a note of that before anything else
